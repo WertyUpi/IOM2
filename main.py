@@ -15,7 +15,7 @@ def upload_file():
       return render_template('not_chosen.html')
     
     input_file_path = os.path.join('uploads', file.filename)
-    output_file_path = os.path.join('templates', report_sample.txt)
+    output_file_path = os.path.join('templates', 'report_sample.txt')
 
     file.save(input_file_path)  # save file it is uploaded
     array = group(file)  # convert file, return array of dicts for each question
