@@ -15,10 +15,13 @@ def upload_file():
       return render_template('not_chosen.html')
     
     input_file_path = os.path.join('uploads', file.filename)
+    output_file_path = os.path.join('templates', report_sample.txt)
+
     file.save(input_file_path)  # save file it is uploaded
     array = group(file)  # convert file, return array of dicts for each question
-    rep(array)
-    return render_template('report.html')  # page if file is uploaded
+    send_file(output_file_path, 'report_sample.txt')
+    return rep(array)
+    # return render_template('report.html')  # page if file is uploaded
   return render_template('index.html')
 
 
@@ -53,6 +56,8 @@ def rep(array):
         if (ind > 2):
           ind_list += 1
       outfile.write(line)
+    return render_template('report.html')
+      
 
 def create_list(keys, values, arr) -> tuple[str, str]:
   str_keys = "\""     # creating a keys string for a diagram
