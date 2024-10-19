@@ -6,6 +6,8 @@ from src.data_grouped import group
 HDRS = 'HTTP/1.1 200 OK\nContent-Type: text/html; charset=utf-8\n\n'
 app = Flask(__name__)
 
+app.config['UPLOAD_FOLDER'] = os.path.abspath(os.path.join(app.root_path, 'uploads'))
+app.config['TEMPLATES_FOLDER'] = os.path.abspath(os.path.join(app.root_path, 'templates'))
 
 @app.route('/', methods=['GET', 'POST'])  # func when located in root
 def upload_file():
@@ -13,23 +15,17 @@ def upload_file():
     file = request.files['file']
     if 'file' not in request.files or file.filename == '':
       return render_template('not_chosen.html')
+    input_file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     
-    input_file_path = os.path.join('uploads', file.filename)
-
-    output_file_path = os.path.join('templates', 'report_sample.txt')
-    result_file_path = os.path.join('templates', 'report.html')
     file.save(input_file_path)  # save file it is uploaded
-    file.save(result_file_path)  # save file it is uploaded
-    file.save(output_file_path)  # save file it is uploaded
     array = group(file)  # convert file, return array of dicts for each question
-    return rep(array, output_file_path, result_file_path)
-    send_file(output_file_path, 'report_sample.txt')
-    send_file(result_file_path, 'report.html')
-    # return render_template('report.html')  # page if file is uploaded
+    rep(array)
+    #ourput_file_path = os.path.join('templates', 'report.html')
+    return render_template('report.html')  # page if file is uploaded
   return render_template('index.html')
 
 
-def rep(array, output_file_path, result_file_path):
+def rep(array):
   workers = ["Работа", "Зарплата", "Менеджмент", "Возможности роста", 
   "Атмосфера", "Перегрузка", "Условия труда", "Стабильность", "Честность",
   "Условия конкурентов привлекательнее", "Негативные эмоции", "Позитивные эмоции"]
@@ -37,7 +33,7 @@ def rep(array, output_file_path, result_file_path):
   simple_answers = ["Да", "Нет"]
   ind = 0     # diagram index
   ind_list = 0  # question index
-  with open(output_file_path, 'r+', encoding='utf-8') as infile, open(result_file_path, 'w', encoding='utf-8') as outfile:  #Открытие шаблона txt и преобразование его в html
+  with open("templates/report_sample.txt", 'r+', encoding='utf-8') as infile, open("templates/report.html", 'w', encoding='utf-8') as outfile:  #Открытие шаблона txt и преобразование его в html
     for line in infile:  # iterating through lines in template html file
       keys = list(array[ind_list].keys())  # keys(reasons) array
       values = list(array[ind_list].values()) # values(frequencies) array
@@ -60,8 +56,6 @@ def rep(array, output_file_path, result_file_path):
         if (ind > 2):
           ind_list += 1
       outfile.write(line)
-    return render_template('report.html')
-      
 
 def create_list(keys, values, arr) -> tuple[str, str]:
   str_keys = "\""     # creating a keys string for a diagram
@@ -81,4 +75,4 @@ def init_dir(filename):
 
 if __name__ == '__main__':
   init_dir('uploads')
-  app.run(host='0.0.0.0', debug=True)
+  app.run(debug=True)
