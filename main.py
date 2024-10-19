@@ -20,7 +20,7 @@ def upload_file():
     file.save(input_file_path)  # save file it is uploaded
     array = group(file)  # convert file, return array of dicts for each question
     rep(array)
-    #ourput_file_path = os.path.join('templates', 'report.html')
+    ourput_file_path = os.path.join('templates', 'report.html')
     return render_template('report.html')  # page if file is uploaded
   return render_template('index.html')
 
